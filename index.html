@@ -17,13 +17,17 @@
   --raised:#141A20;
   --ink:#EAEEF1;
   --muted:#8C949E;
-  --faint:#5C646E;
+  --faint:#808892;   /* 4.59:1 over the veiled ground; #5C646E only made 2.75 */
   --rule:#1D242B;
   --dry:#E455C0;          /* computational channel */
   --wet:#2FD98A;          /* experimental channel */
   --merge:#F2F6F8;        /* both channels coincident */
   --dry-wash:rgba(228,85,192,.10);
   --wet-wash:rgba(47,217,138,.10);
+  /* page ground: the two channels bleeding in from either side and meeting */
+  --veil-wet:rgba(47,217,138,.085);
+  --veil-dry:rgba(228,85,192,.085);
+  --veil-lift:rgba(150,175,205,.05);
   --glow:.55;
   --warn-bg:#2A2113; --warn-ink:#E8C583; --warn-rule:#4A3A1C;
 
@@ -37,9 +41,13 @@
    Brightfield is opt-in via the toggle, and the choice then persists. */
 :root[data-theme="light"]{
   --ground:#FAF9F6; --surface:#FFFFFF; --raised:#F2F1ED;
-  --ink:#14181C; --muted:#585F68; --faint:#8B929B; --rule:#DFDDD6;
+  --ink:#14181C; --muted:#585F68; --faint:#636A73; --rule:#DFDDD6;
   --dry:#A81E8C; --wet:#0F6E44; --merge:#14181C;
   --dry-wash:rgba(168,30,140,.07); --wet-wash:rgba(15,110,68,.07);
+  /* lighter grounds band far more easily, so these run about half strength */
+  --veil-wet:rgba(15,110,68,.05);
+  --veil-dry:rgba(168,30,140,.045);
+  --veil-lift:rgba(120,110,90,.035);
   --glow:0;
   --warn-bg:#FDF3E3; --warn-ink:#7A4E10; --warn-rule:#E8CFA0;
 }
@@ -51,6 +59,16 @@ body{
   margin:0;background:var(--ground);color:var(--ink);
   font-family:var(--f-body);font-size:15.5px;line-height:1.62;
   -webkit-font-smoothing:antialiased;
+}
+/* Fixed behind everything: a wide green wash from the left, magenta from the
+   right, and a faint central lift. Pinned rather than attachment:fixed, which
+   repaints badly on mobile. */
+body::before{
+  content:"";position:fixed;inset:0;z-index:-2;pointer-events:none;
+  background:
+    radial-gradient(85% 55% at 2% 0%,   var(--veil-wet)  0%, transparent 62%),
+    radial-gradient(85% 55% at 98% 0%,  var(--veil-dry)  0%, transparent 62%),
+    radial-gradient(120% 75% at 50% 42%, var(--veil-lift) 0%, transparent 68%);
 }
 a{color:inherit;text-decoration:none}
 :focus-visible{outline:2px solid var(--merge);outline-offset:3px;border-radius:2px}
@@ -278,6 +296,7 @@ footer{border-top:1px solid var(--rule);padding:1.9rem 0 0;margin-top:1rem;
     --dry-wash:#FBF2F9;--wet-wash:#F1F8F4;--glow:0;
   }
   body{font-size:9.6pt;line-height:1.42}
+  body::before{display:none}
   body.off-dry [data-ch="dry"],body.off-wet [data-ch="wet"]{opacity:1 !important;filter:none !important}
   .bar,#guard{display:none !important}
   .hero{padding:0 0 .8rem}
