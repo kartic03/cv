@@ -304,8 +304,12 @@ footer{border-top:1px solid var(--rule);padding:1.9rem 0 0;margin-top:1rem;
   .name{font-size:26pt}
   .thesis{font-size:11pt}
   .wrap{max-width:none;padding:0}
-  section{padding:.85rem 0;break-inside:avoid;grid-template-columns:6.4rem minmax(0,1fr);gap:1.1rem}
+  /* Sections may break across pages: keeping a whole section together left
+     half of page one blank and pushed the CV to seven pages. What must not
+     break is an individual entry, publication or capability block. */
+  section{padding:.85rem 0;grid-template-columns:6.4rem minmax(0,1fr);gap:1.1rem}
   .cap,.entry,ol.pubs li,.now{break-inside:avoid}
+  h2,.cap h3,.entry h3{break-after:avoid}
   @page{margin:13mm}
 }
 @media (prefers-reduced-motion:reduce){
