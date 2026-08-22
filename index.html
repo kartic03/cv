@@ -104,6 +104,9 @@ a{color:inherit;text-decoration:none}
   color:var(--muted);font:inherit;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;
 }
 .bar .btn:hover{color:var(--ink);border-color:var(--muted)}
+/* The PDF control is an <a> to a hosted file rather than a print button, so it
+   needs the box model a <button> gets for free. */
+a.btn{display:inline-flex;align-items:center;text-decoration:none;line-height:1.6}
 
 /* ─────────────────────────── placeholder guard ─────────────────────────── */
 #guard{display:none;background:var(--warn-bg);color:var(--warn-ink);
@@ -330,7 +333,7 @@ footer{border-top:1px solid var(--rule);padding:1.9rem 0 0;margin-top:1rem;
       <button class="chip on" data-c="wet" aria-pressed="true"><span class="dot"></span>Experimental</button>
     </div>
     <button class="btn" id="viewBtn">Brightfield</button>
-    <button class="btn" onclick="window.print()">PDF</button>
+    <a class="btn" href="https://drive.google.com/file/d/1Rs8hv-LhqOeCrk-mHCh7YefXGuxjzGuD/view?usp=drive_link" target="_blank" rel="noopener noreferrer">PDF</a>
   </div>
 </div>
 
