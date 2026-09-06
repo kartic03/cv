@@ -313,6 +313,12 @@ footer{border-top:1px solid var(--rule);padding:1.9rem 0 0;margin-top:1rem;
   section{padding:.85rem 0;grid-template-columns:6.4rem minmax(0,1fr);gap:1.1rem}
   .cap,.entry,ol.pubs li,.now{break-inside:avoid}
   h2,.cap h3,.entry h3{break-after:avoid}
+  /* Chromium pushes a flex container whole rather than fragmenting it, so a
+     skills list that no longer fitted jumped to the next page and left the
+     previous one nearly empty. Block layout in print lets it split between
+     rows; the rows themselves still stay intact. */
+  #skills .col,#skills .rows,#code .col{display:block}
+  #skills .row,#code .row{break-inside:avoid;margin-bottom:.55rem}
   @page{margin:13mm}
 }
 @media (prefers-reduced-motion:reduce){
@@ -577,7 +583,9 @@ footer{border-top:1px solid var(--rule);padding:1.9rem 0 0;margin-top:1rem;
     <h2 class="label">Skills</h2>
     <div class="col">
       <dl class="rows">
-        <div class="row" data-ch="dry"><dt>Protein ML</dt><dd>ESM-2 · ESMC · sparse autoencoders · transformers · retrieval-augmented and multi-task architectures · PyTorch</dd></div>
+        <div class="row" data-ch="dry"><dt>Programming</dt><dd>Python · R · C/C++ · SQL</dd></div>
+        <div class="row" data-ch="dry"><dt>Frameworks and libraries</dt><dd>PyTorch · TensorFlow · scikit-learn · Biopython · scikit-bio</dd></div>
+        <div class="row" data-ch="dry"><dt>Protein ML</dt><dd>ESM-2 · ESMC · sparse autoencoders · transformers · retrieval-augmented and multi-task architectures</dd></div>
         <div class="row" data-ch="dry"><dt>Protein design</dt><dd>Backbone generation (RFdiffusion) · sequence design (ProteinMPNN) · structure and complex prediction (AlphaFold2, AlphaFold3, Boltz-1, Boltz-2, ESMFold, ColabFold)</dd></div>
         <div class="row" data-ch="dry"><dt>Structure</dt><dd>Schrödinger suite · molecular docking · structure-based virtual screening · molecular dynamics simulation</dd></div>
         <div class="row" data-ch="dry"><dt>Statistics</dt><dd>Nested cross-validation · leakage auditing · calibration and uncertainty · applicability domain · preregistration · equivalence testing</dd></div>
