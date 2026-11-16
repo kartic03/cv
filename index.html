@@ -281,6 +281,12 @@ a.btn{text-decoration:none}
 }
 .group:hover{box-shadow:var(--tile-lift)}
 .group + .group{margin-top:.7rem}
+/* that spacing is for groups stacked in normal flow. Inside a grid the gap
+   already separates them, and the margin only pushes each card down inside
+   its own cell, which is what made the pairs look mismatched. */
+.grid2 > .group + .group{margin-top:0}
+.grid2{align-items:stretch}
+.grid2 > .group{display:flex;flex-direction:column}
 .item{padding:1.05rem 1.2rem;position:relative}
 .item + .item::before{content:"";position:absolute;top:0;left:1.2rem;right:0;height:.5px;
   background:color-mix(in srgb,var(--ink) 11%,transparent)}
