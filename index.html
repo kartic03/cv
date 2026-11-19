@@ -56,6 +56,10 @@
   --coral-solid:#FF5A52;    /* the chosen hue, used on fills and icons only, never on text */
   --blue-soft:#EAF0FF;
   --coral-soft:#FFEEED;
+  --chip-b:#1955ED;         /* chip ink, a step deeper than the brand pair:
+                                 12px on a pale tint on glass, where the plain
+                                 colours composite to just under 4.5:1 */
+  --chip-c:#B9362F;
   --panel:#F4F5F7;          /* the enables panel. Fixed, not mixed from --label3:
                                mixing it meant darkening the grey darkened this
                                surface too, and took its own labels below 4.5:1 */
@@ -102,6 +106,8 @@
   --coral-solid:#FF6A62;
   --blue-soft:rgba(110,149,255,.13);
   --coral-soft:rgba(255,128,120,.13);
+  --chip-b:var(--blue);     /* already 5.5:1 and 6.6:1 on the dark chips */
+  --chip-c:var(--coral);
   --panel:#1E2129;
   --violet:#A98DFF;
   --violet-soft:rgba(169,141,255,.13);
@@ -154,8 +160,19 @@ h1,h2,h3{color:var(--ink);margin:0;letter-spacing:-.022em;font-weight:600}
   border-bottom:.5px solid transparent;transition:border-color .3s ease;
 }
 body.scrolled .bar{border-bottom-color:var(--sep)}
-.bar::after{content:"";position:absolute;left:0;bottom:-.5px;height:2px;
-  width:calc(var(--scroll,0) * 100%);background:linear-gradient(90deg,var(--blue),var(--coral-solid))}
+/* scaleX, not width: width is a layout property and this runs on every
+   frame of every scroll. The gradient is painted across the full bar and
+   squashed with it, so the colours read the same as before. */
+.bar::after{content:"";position:absolute;left:0;bottom:-.5px;height:2px;width:100%;
+  transform:scaleX(var(--scroll,0));transform-origin:0 50%;
+  background:linear-gradient(90deg,var(--blue),var(--coral-solid))}
+@supports (animation-timeline:scroll()){
+  /* Driven by the scroller itself, off the main thread. The script then has
+     no reason to measure the document, which was costing 114 ms of layout
+     during load. */
+  @keyframes bar-progress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+  .bar::after{animation:bar-progress auto linear;animation-timeline:scroll(root)}
+}
 .bar-in{max-width:var(--shell);margin:0 auto;height:var(--navh);padding:0 1.1rem;
   display:flex;align-items:center;gap:.5rem;font-size:13px;letter-spacing:-.006em}
 .brand{display:inline-flex;align-items:center;gap:.5rem;margin-right:auto;color:var(--label2);font-weight:500}
@@ -340,8 +357,11 @@ body.off-dry.off-wet [data-ch="both"]{opacity:.22;filter:saturate(.12)}
 .chip{display:inline-flex;align-items:center;gap:.34rem;font-size:12px;font-weight:600;
   border-radius:7px;padding:.18rem .48rem;letter-spacing:-.004em;
   background:color-mix(in srgb,var(--label3) 14%,transparent);color:var(--label2)}
-.chip.b{background:var(--blue-soft);color:var(--blue)}
-.chip.c{background:var(--coral-soft);color:var(--coral)}
+/* Own ink, one step deeper than the brand colours: 12px on a pale tint on a
+   glass card, where the composited sample runs about 0.14 lighter than the
+   token and the plain colours land just under 4.5:1. */
+.chip.b{background:var(--blue-soft);color:var(--chip-b)}
+.chip.c{background:var(--coral-soft);color:var(--chip-c)}
 .chip.v{background:var(--violet-soft);color:var(--violet)}
 .chip.k{background:color-mix(in srgb,var(--ink) 10%,transparent);color:var(--ink)}
 /* opaque on purpose: light glass stacked on light glass is unreadable */
@@ -867,9 +887,12 @@ footer{margin:3rem 0 0;padding:1.3rem .3rem 3.5rem;display:flex;justify-content:
     viewBtn.textContent = labelFor();
   });
 
-  /* scrollHeight was read on every frame, which forces layout. The height
-     only moves when the window resizes or a channel is filtered out, so it is
-     measured once and invalidated at those two points. */
+  /* The bar is CSS-driven where scroll timelines exist, and the reduced
+     motion block disables animations, so the measuring path below is only for
+     browsers that have neither. Where it does run, the height is measured once
+     and invalidated on resize and on a channel filter, not read every frame. */
+  var cssBar = !!(window.CSS && CSS.supports && CSS.supports('animation-timeline', 'scroll()')) &&
+               !(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
   var ticking = false, maxScroll = null;
   function measure() {
     maxScroll = document.documentElement.scrollHeight - window.innerHeight;
@@ -878,9 +901,11 @@ footer{margin:3rem 0 0;padding:1.3rem .3rem 3.5rem;display:flex;justify-content:
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(function () {
-      if (maxScroll === null) measure();
       var top = window.scrollY || 0;
-      root.style.setProperty('--scroll', maxScroll > 0 ? Math.min(top / maxScroll, 1).toFixed(4) : 0);
+      if (!cssBar) {
+        if (maxScroll === null) measure();
+        root.style.setProperty('--scroll', maxScroll > 0 ? Math.min(top / maxScroll, 1).toFixed(4) : 0);
+      }
       body.classList.toggle('scrolled', top > 8);
       ticking = false;
     });
