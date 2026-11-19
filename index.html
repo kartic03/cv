@@ -8,12 +8,26 @@
 <meta name="theme-color" content="#F2F3F7">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='26' fill='%231B5BFF'/><circle cx='38' cy='50' r='19' fill='%23fff'/><circle cx='64' cy='50' r='19' fill='%23FF5A52'/></svg>">
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300..800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Geist, self-hosted. The Google Fonts stylesheet was the page's only
+     render-blocking request and sat on a third-party origin: HTML, then the
+     CSS, then the woff2, before a word could paint in its real face. These are
+     the same two latin subsets Chrome was fetching from gstatic anyway. Only
+     the body face is preloaded; the mono face sets DOIs, none of which are
+     above the fold. SIL OFL 1.1, text in fonts/OFL.txt. -->
+<link rel="preload" href="fonts/geist-latin.woff2" as="font" type="font/woff2" crossorigin>
 
 <script>document.documentElement.className='js'</script>
 <style>
+/* Variable faces, so one file covers every weight the page asks for. The
+   weight pairs mirror what the Google API served, and unicode-range keeps the
+   stack falling through to the system font for anything outside latin. */
+@font-face{font-family:Geist;font-style:normal;font-weight:300 800;font-display:swap;
+  src:url(fonts/geist-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist Mono';font-style:normal;font-weight:400;font-display:swap;
+  src:url(fonts/geist-mono-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:'Geist Mono';font-style:normal;font-weight:500;font-display:swap;
+  src:url(fonts/geist-mono-latin.woff2) format('woff2');unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+0304,U+0308,U+0329,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+
 /* ══════════════════════════════════════════════════════════════════
    Built to the iOS grouped-list language: a soft grey ground, white
    cards floating on it with generous radii, hairline separators, and
@@ -32,13 +46,19 @@
   --ink:#0A0D12;            /* 18.2:1 on card */
   --label:#2E333C;          /* 11.6:1, body copy */
   --label2:#5A606B;         /* 6.4:1 */
-  --label3:#868C96;         /* 4.5:1, identifiers only */
+  --label3:#676B73;         /* 4.8:1 on the ground, 5.1:1 on a card. The ground
+                                 carries the .bg tints, so it needs the margin. */
 
   --blue:#1B5BFF;           /* computational */
-  --coral:#F0463D;          /* experimental, darkened from FF5A52 for 4.6:1 on white */
-  --coral-solid:#FF5A52;    /* the chosen hue, used on fills where contrast is carried by white */
+  --coral:#C63A32;          /* experimental. 4.5:1 on the enables panel, which is
+                                 the darkest surface it is set on. Nothing here
+                                 sits on pure white, so white is not the test. */
+  --coral-solid:#FF5A52;    /* the chosen hue, used on fills and icons only, never on text */
   --blue-soft:#EAF0FF;
   --coral-soft:#FFEEED;
+  --panel:#F4F5F7;          /* the enables panel. Fixed, not mixed from --label3:
+                               mixing it meant darkening the grey darkened this
+                               surface too, and took its own labels below 4.5:1 */
   --violet:#6E4BF0;         /* neither channel: patents, counts */
   --violet-soft:#F0ECFE;
 
@@ -82,6 +102,7 @@
   --coral-solid:#FF6A62;
   --blue-soft:rgba(110,149,255,.13);
   --coral-soft:rgba(255,128,120,.13);
+  --panel:#1E2129;
   --violet:#A98DFF;
   --violet-soft:rgba(169,141,255,.13);
   --shadow:0 1px 1px rgba(0,0,0,.5),0 8px 20px -10px rgba(0,0,0,.8);
@@ -325,7 +346,7 @@ body.off-dry.off-wet [data-ch="both"]{opacity:.22;filter:saturate(.12)}
 .chip.k{background:color-mix(in srgb,var(--ink) 10%,transparent);color:var(--ink)}
 /* opaque on purpose: light glass stacked on light glass is unreadable */
 .enables{margin:.75rem 0 0;padding:.7rem .85rem;border-radius:12px;
-  background:color-mix(in srgb,var(--card) 72%,var(--label3) 13%);
+  background:var(--panel);
   box-shadow:inset 0 .5px 0 rgba(255,255,255,.5);
   font-size:14.5px;color:var(--ink)}
 .enables b{display:block;font-size:11.5px;font-weight:600;letter-spacing:.04em;
@@ -393,8 +414,13 @@ footer{margin:3rem 0 0;padding:1.3rem .3rem 3.5rem;display:flex;justify-content:
   .hero{padding:2.2rem 0 .8rem}
   .sec{padding:2rem 0 0}
   .brand span:not(.appicon){display:none}
-  .seg button span:not(.dot){display:none}
-  .seg button{padding:.38rem .5rem}
+  /* The label is the button's only accessible name, so it is clipped
+     rather than removed. display:none left two unnamed buttons on a phone. */
+  .seg button span:not(.dot){
+    position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+    overflow:hidden;clip-path:inset(50%);white-space:nowrap;
+  }
+  .seg button{padding:.38rem .5rem;position:relative}
   .item{padding:.95rem 1rem}
   .item + .item::before{left:1rem}
 }
@@ -823,6 +849,7 @@ footer{margin:3rem 0 0;padding:1.3rem .3rem 3.5rem;display:flex;justify-content:
       b.classList.toggle('on', on);
       b.setAttribute('aria-pressed', String(on));
       body.classList.toggle('off-' + c, !on);
+      invalidate();
     });
   });
 
@@ -840,20 +867,27 @@ footer{margin:3rem 0 0;padding:1.3rem .3rem 3.5rem;display:flex;justify-content:
     viewBtn.textContent = labelFor();
   });
 
-  var ticking = false;
+  /* scrollHeight was read on every frame, which forces layout. The height
+     only moves when the window resizes or a channel is filtered out, so it is
+     measured once and invalidated at those two points. */
+  var ticking = false, maxScroll = null;
+  function measure() {
+    maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+  }
   function onScroll() {
     if (ticking) return;
     ticking = true;
     requestAnimationFrame(function () {
+      if (maxScroll === null) measure();
       var top = window.scrollY || 0;
-      var max = document.documentElement.scrollHeight - window.innerHeight;
-      root.style.setProperty('--scroll', max > 0 ? Math.min(top / max, 1).toFixed(4) : 0);
+      root.style.setProperty('--scroll', maxScroll > 0 ? Math.min(top / maxScroll, 1).toFixed(4) : 0);
       body.classList.toggle('scrolled', top > 8);
       ticking = false;
     });
   }
+  function invalidate() { maxScroll = null; onScroll(); }
   window.addEventListener('scroll', onScroll, { passive: true });
-  window.addEventListener('resize', onScroll, { passive: true });
+  window.addEventListener('resize', invalidate, { passive: true });
   onScroll();
 
   /* reveal; every failure path ends visible, because the PDF is printed
